@@ -153,7 +153,9 @@ public class RdmaEndpoint {
 			} else if (eventType == RdmaCmEvent.EventType.RDMA_CM_EVENT_CONNECT_REQUEST.ordinal()) {
 				logger.info("got event type + RDMA_CM_EVENT_CONNECT_REQUEST, srcAddress " + this.getSrcAddr() + ", dstAddress " + this.getDstAddr());
 			} else {
-				logger.info("got event type + UNKNOWN, srcAddress " + this.getSrcAddr() + ", dstAddress " + this.getDstAddr());
+				String message = "got event type + UNKNOWN ("+eventType+"), srcAddress " + this.getSrcAddr() + ", dstAddress " + this.getDstAddr();
+				logger.info(message);
+				throw new IOException(message);
 			}
 		} catch (Exception e) {
 			throw new IOException(e);
@@ -271,6 +273,10 @@ public class RdmaEndpoint {
 	 */
 	public SVCRegMr registerMemory(ByteBuffer buffer) throws IOException {
 		return pd.regMr(buffer, access);
+	}
+
+	public SVCRegMr registerMemory(long address, int length) throws IOException{
+		return pd.regMr(address, length, access);
 	}
 	
 	/**
