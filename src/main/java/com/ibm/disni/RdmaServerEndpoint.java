@@ -26,6 +26,7 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import com.ibm.disni.verbs.IbvContext;
 import org.slf4j.Logger;
 
 import com.ibm.disni.verbs.IbvMr;

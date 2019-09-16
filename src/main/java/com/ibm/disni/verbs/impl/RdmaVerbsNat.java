@@ -131,6 +131,10 @@ public class RdmaVerbsNat extends RdmaVerbs {
 		return new NatRegMrCall(this, nativeDispatcher, memAlloc, pd, buffer, access);
 	}
 
+	public SVCRegMr regMr(IbvPd pd,  int access) {
+		return new NatRegMrCall(this, nativeDispatcher, memAlloc, pd,  access);
+	}
+
 	public SVCRegMr regMr(IbvPd pd, long address, int length, int access) {
 		return new NatRegMrCall(this, nativeDispatcher, memAlloc, pd, address, length, access);
 

@@ -61,6 +61,9 @@ public class RdmaEndpointProvider {
 	public synchronized IbvPd createProtectionDomain(IbvContext context) throws IOException {
 		if (context != null) {
 			IbvPd pd = null;
+			int odpSupport =context.queryOdpSupport();
+			System.out.println(odpSupport!=-1?"Odp is supported":"Odp is not supported");
+			System.out.println("Returned odp flag "+odpSupport);
 			int key = context.getCmd_fd();
 			if (!pdMap.containsKey(key)) {
 				pd = context.allocPd();

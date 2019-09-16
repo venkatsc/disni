@@ -73,7 +73,7 @@ public class RdmaEndpoint {
 		this.endpointId = group.getNextId();
 		this.group = group;
 		this.idPriv = idPriv;
-		this.access = IbvMr.IBV_ACCESS_LOCAL_WRITE | IbvMr.IBV_ACCESS_REMOTE_WRITE | IbvMr.IBV_ACCESS_REMOTE_READ; 	
+		this.access = IbvMr.IBV_ACCESS_LOCAL_WRITE | IbvMr.IBV_ACCESS_REMOTE_WRITE | IbvMr.IBV_ACCESS_REMOTE_READ|IbvMr.IBV_ACCESS_ON_DEMAND;
 		
 		this.qp = null;
 		this.pd = null;
@@ -277,6 +277,10 @@ public class RdmaEndpoint {
 
 	public SVCRegMr registerMemory(long address, int length) throws IOException{
 		return pd.regMr(address, length, access);
+	}
+
+	public SVCRegMr registerMemory() throws IOException{
+		return pd.regMr( access);
 	}
 	
 	/**
