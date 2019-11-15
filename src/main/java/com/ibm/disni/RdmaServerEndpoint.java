@@ -234,6 +234,10 @@ public class RdmaServerEndpoint<C extends RdmaEndpoint> {
 	public SVCRegMr registerMemory(ByteBuffer buffer) throws IOException {
 		return pd.regMr(buffer, access);
 	}
+
+	public SVCRegMr registerMemory(long address, int length) throws IOException{
+		return pd.regMr(address, length, access);
+	}
 	
 	/**
 	 * Deregister memory.
