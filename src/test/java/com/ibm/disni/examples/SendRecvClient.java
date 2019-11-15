@@ -47,7 +47,7 @@ public class SendRecvClient implements RdmaEndpointFactory<SendRecvClient.Custom
 
 	public void run() throws Exception {
 		//create a EndpointGroup. The RdmaActiveEndpointGroup contains CQ processing and delivers CQ event to the endpoint.dispatchCqEvent() method.
-		endpointGroup = new RdmaActiveEndpointGroup<SendRecvClient.CustomClientEndpoint>(1000, false, 128, 4, 128);
+		endpointGroup = new RdmaActiveEndpointGroup<SendRecvClient.CustomClientEndpoint>(1000, false, 128,128, 4, 128);
 		endpointGroup.init(this);
 		//we have passed our own endpoint factory to the group, therefore new endpoints will be of type CustomClientEndpoint
 		//let's create a new client endpoint

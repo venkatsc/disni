@@ -42,7 +42,7 @@ public class ReadClient implements RdmaEndpointFactory<ReadClient.ReadClientEndp
 	private int loop;
 
 	public ReadClient(String host, int port, int size, int loop) throws IOException{
-		this.group = new RdmaPassiveEndpointGroup<ReadClient.ReadClientEndpoint>(1, 10, 4, 40);
+		this.group = new RdmaPassiveEndpointGroup<ReadClient.ReadClientEndpoint>(1, 10,10, 4, 40);
 		this.group.init(this);
 		this.host = host;
 		this.port = port;

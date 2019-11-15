@@ -46,22 +46,24 @@ import com.ibm.disni.util.DiSNILogger;
 public class RdmaPassiveEndpointGroup<C extends RdmaEndpoint> extends RdmaEndpointGroup<C> {
 	private static final Logger logger = DiSNILogger.getLogger();
 	
-	private int maxWR;		
+	private int maxSendWR;
+	private int maxRecvWR;
 	private int maxSge;
 	private int cqSize;
 	
-	public RdmaPassiveEndpointGroup<RdmaEndpoint> createDefaultGroup(int timeout, int maxWR, int maxSge, int cqSize) throws IOException{
-		RdmaPassiveEndpointGroup<RdmaEndpoint> group = new RdmaPassiveEndpointGroup<RdmaEndpoint>(timeout, maxWR, maxSge, cqSize);
+	public RdmaPassiveEndpointGroup<RdmaEndpoint> createDefaultGroup(int timeout, int maxSendWR,int maxRecvWR, int maxSge, int cqSize) throws IOException{
+		RdmaPassiveEndpointGroup<RdmaEndpoint> group = new RdmaPassiveEndpointGroup<RdmaEndpoint>(timeout, maxSendWR,maxRecvWR, maxSge, cqSize);
 		group.init(new RawEndpointFactory(group));
 		return group;
 	}	
 	
-	public RdmaPassiveEndpointGroup(int timeout, int maxWR, int maxSge, int cqSize) throws IOException{
+	public RdmaPassiveEndpointGroup(int timeout, int maxSendWR,int maxRecvWR, int maxSge, int cqSize) throws IOException{
 		super(timeout);
-		this.maxWR = maxWR;		
+		this.maxSendWR = maxSendWR;
+		this.maxRecvWR = maxRecvWR;
 		this.maxSge = maxSge;
 		this.cqSize = cqSize;
-		logger.info("passive endpoint group, maxWR " + this.maxWR + ", maxSge " + this.maxSge + ", cqSize " + this.cqSize);
+		logger.info("active endpoint group, maxSendWR {}, maxRecvWR {}, maxSge {}, cqSize {}",maxSendWR,maxRecvWR, maxSge,cqSize);
 	}
 	
 	public RdmaCqProvider createCqProvider(C endpoint) throws IOException {
@@ -74,9 +76,9 @@ public class RdmaPassiveEndpointGroup<C extends RdmaEndpoint> extends RdmaEndpoi
 		IbvCQ cq = cqProvider.getCQ();
 		IbvQPInitAttr attr = new IbvQPInitAttr();
 		attr.cap().setMax_recv_sge(this.maxSge);
-		attr.cap().setMax_recv_wr(this.maxWR);
+		attr.cap().setMax_recv_wr(this.maxRecvWR);
 		attr.cap().setMax_send_sge(this.maxSge);
-		attr.cap().setMax_send_wr(this.maxWR);
+		attr.cap().setMax_send_wr(this.maxSendWR);
 		attr.setQp_type(IbvQP.IBV_QPT_RC);
 		attr.setRecv_cq(cq);
 		attr.setSend_cq(cq);	
@@ -88,9 +90,9 @@ public class RdmaPassiveEndpointGroup<C extends RdmaEndpoint> extends RdmaEndpoi
 		endpoint.allocateResources();
 	}
 	
-	public int getMaxWR() {
-		return maxWR;
-	}
+//	public int getMaxWR() {
+//		return maxWR;
+//	}
 
 	public int getMaxSge() {
 		return maxSge;

@@ -47,7 +47,7 @@ public class ReadServer implements RdmaEndpointFactory<ReadServer.CustomServerEn
 
 	public void run() throws Exception {
 		//create a EndpointGroup. The RdmaActiveEndpointGroup contains CQ processing and delivers CQ event to the endpoint.dispatchCqEvent() method.
-		endpointGroup = new RdmaActiveEndpointGroup<CustomServerEndpoint>(1000, false, 128, 4, 128);
+		endpointGroup = new RdmaActiveEndpointGroup<CustomServerEndpoint>(1000, false,128, 128, 4, 128);
 		endpointGroup.init(this);
 		//create a server endpoint
 		RdmaServerEndpoint<ReadServer.CustomServerEndpoint> serverEndpoint = endpointGroup.createServerEndpoint();

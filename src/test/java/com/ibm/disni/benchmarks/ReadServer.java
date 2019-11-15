@@ -40,7 +40,7 @@ public class ReadServer implements RdmaEndpointFactory<ReadServer.ReadServerEndp
 	private int loop;
 
 	public ReadServer(String host, int port, int size, int loop) throws IOException{
-		this.group = new RdmaActiveEndpointGroup<ReadServer.ReadServerEndpoint>(1, false, 128, 4, 128);
+		this.group = new RdmaActiveEndpointGroup<ReadServer.ReadServerEndpoint>(1, false,128, 128, 4, 128);
 		this.group.init(this);
 		this.host = host;
 		this.port = port;

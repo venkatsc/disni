@@ -44,17 +44,20 @@ public class RdmaActiveEndpointGroup<C extends RdmaActiveEndpoint> extends RdmaE
 	private boolean polling;
 	protected int cqSize;
 	protected int maxSge;
-	protected int maxWR;		
+	protected int maxSendWR;
+	protected int maxRecvWR;
 
-	public RdmaActiveEndpointGroup(int timeout, boolean polling, int maxWR, int maxSge, int cqSize) throws IOException {
+
+	public RdmaActiveEndpointGroup(int timeout, boolean polling, int maxSendWR, int maxRecvWR, int maxSge, int cqSize) throws IOException {
 		super(timeout);
 		this.timeout = timeout;
 		this.polling = polling;
 		cqMap = new HashMap<Integer, RdmaActiveCqProcessor<C>>();
 		this.cqSize = cqSize;
 		this.maxSge = maxSge;
-		this.maxWR = maxWR;
-		logger.info("active endpoint group, maxWR " + maxWR + ", maxSge " + maxSge + ", cqSize " + cqSize);
+		this.maxSendWR = maxSendWR;
+		this.maxRecvWR = maxRecvWR;
+		logger.info("active endpoint group, maxSendWR {}, maxRecvWR {}, maxSge {}, cqSize {}",maxSendWR,maxRecvWR, maxSge,cqSize);
 	}
 	
 	public RdmaCqProvider createCqProvider(C endpoint) throws IOException {
@@ -65,7 +68,7 @@ public class RdmaActiveEndpointGroup<C extends RdmaActiveEndpoint> extends RdmaE
 			RdmaActiveCqProcessor<C> cqProcessor = null;
 			int key = context.getCmd_fd();
 			if (!cqMap.containsKey(key)) {
-				cqProcessor = new RdmaActiveCqProcessor<C>(context, cqSize, maxWR, 0, 1, timeout, polling);
+				cqProcessor = new RdmaActiveCqProcessor<C>(context, cqSize, 0, 1, timeout, polling);
 				cqMap.put(context.getCmd_fd(), cqProcessor);
 				cqProcessor.start();
 			}
@@ -84,9 +87,9 @@ public class RdmaActiveEndpointGroup<C extends RdmaActiveEndpoint> extends RdmaE
 		
 		IbvQPInitAttr attr = new IbvQPInitAttr();
 		attr.cap().setMax_recv_sge(maxSge);
-		attr.cap().setMax_recv_wr(maxWR);
+		attr.cap().setMax_recv_wr(maxRecvWR);
 		attr.cap().setMax_send_sge(maxSge);
-		attr.cap().setMax_send_wr(maxWR);
+		attr.cap().setMax_send_wr(maxSendWR);
 		attr.setQp_type(IbvQP.IBV_QPT_RC);
 		attr.setRecv_cq(cq);
 		attr.setSend_cq(cq);		
@@ -115,9 +118,9 @@ public class RdmaActiveEndpointGroup<C extends RdmaActiveEndpoint> extends RdmaE
 		cqProcessor.unregister(endpoint);
 	}
 	
-	public int getMaxWR() {
-		return maxWR;
-	}
+//	public int getMaxWR() {
+//		return maxSendWR;
+//	}
 
 	public int getCqSize() {
 		return cqSize;

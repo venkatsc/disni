@@ -128,7 +128,7 @@ public class RDMAvsTcpBenchmarkServer implements RdmaEndpointFactory<SendRecvSer
 
     // Start RDMA Server
     //create a EndpointGroup. The RdmaActiveEndpointGroup contains CQ processing and delivers CQ event to the endpoint.dispatchCqEvent() method.
-    endpointGroup = new RdmaActiveEndpointGroup<SendRecvServer.CustomServerEndpoint>(1000, false, 128, 4, 128);
+    endpointGroup = new RdmaActiveEndpointGroup<SendRecvServer.CustomServerEndpoint>(1000, false, 128, 128,4, 128);
     endpointGroup.init(this);
     //create a server endpoint
     serverEndpoint = endpointGroup.createServerEndpoint();

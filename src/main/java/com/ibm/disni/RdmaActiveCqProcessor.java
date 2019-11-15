@@ -28,8 +28,8 @@ import com.ibm.disni.verbs.IbvWC;
 
 public class RdmaActiveCqProcessor<C extends RdmaActiveEndpoint> extends RdmaCqProcessor<C> {
 	
-	public RdmaActiveCqProcessor(IbvContext context, int cqSize, int wrSize, long affinity, int clusterId, int timeout, boolean polling) throws IOException {
-		super(context, cqSize, wrSize, affinity, clusterId, timeout, polling);
+	public RdmaActiveCqProcessor(IbvContext context, int cqSize, long affinity, int clusterId, int timeout, boolean polling) throws IOException {
+		super(context, cqSize, affinity, clusterId, timeout, polling);
 	}
 
 	@Override

@@ -44,7 +44,7 @@ public class SendRecvServer implements RdmaEndpointFactory<SendRecvServer.SendRe
 	private int recvQueueSize;
 
 	public SendRecvServer(String host, int port, int size, int loop, int recvQueueSize) throws IOException{
-		this.group = new RdmaPassiveEndpointGroup<SendRecvServer.SendRecvEndpoint>(1, recvQueueSize, 1, recvQueueSize*2);
+		this.group = new RdmaPassiveEndpointGroup<SendRecvServer.SendRecvEndpoint>(1, recvQueueSize,recvQueueSize, 1, recvQueueSize*2);
 		this.group.init(this);
 		this.host = host;
 		this.port = port;

@@ -74,7 +74,7 @@ public class RDMAvsTcpBenchmarkClient implements RdmaEndpointFactory<CustomClien
 
   public void runRDMA() throws Exception {
     //create a EndpointGroup. The RdmaActiveEndpointGroup contains CQ processing and delivers CQ event to the endpoint.dispatchCqEvent() method.
-    endpointGroup = new RdmaActiveEndpointGroup<CustomClientEndpoint>(1000, false, 128, 4, 128);
+    endpointGroup = new RdmaActiveEndpointGroup<CustomClientEndpoint>(1000, false, 128,128, 4, 128);
     endpointGroup.init(this);
     //we have passed our own endpoint factory to the group, therefore new endpoints will be of type CustomClientEndpoint
     //let's create a new client endpoint
