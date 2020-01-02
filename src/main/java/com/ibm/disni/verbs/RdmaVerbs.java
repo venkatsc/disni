@@ -113,8 +113,6 @@ public abstract class RdmaVerbs {
 	 * @throws Exception on failure.
 	 */
 	public abstract SVCRegMr regMr(IbvPd pd, ByteBuffer buffer, int access) throws IOException;
-
-	public abstract SVCRegMr regMr(IbvPd pd, int access) throws IOException;
 	
 	public abstract SVCRegMr regMr(IbvPd pd, long address, int length, int access) throws IOException;
 

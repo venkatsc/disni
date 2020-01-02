@@ -158,8 +158,6 @@ public class ReadClient implements RdmaEndpointFactory<ReadClient.CustomClientEn
 
 		private ArrayBlockingQueue<IbvWC> wcEvents;
 
-
-
 		public CustomClientEndpoint(RdmaActiveEndpointGroup<? extends CustomClientEndpoint> endpointGroup, RdmaCmId idPriv, boolean isServerSide) throws IOException {
 			super(endpointGroup, idPriv, isServerSide);
 			this.buffercount = 3;
@@ -223,7 +221,7 @@ public class ReadClient implements RdmaEndpointFactory<ReadClient.CustomClientEn
 			wrList_recv.add(recvWR);
 
 			System.out.println("ReadClient::initiated recv");
-//			this.postRecv(wrList_recv).execute().free();
+			this.postRecv(wrList_recv).execute().free();
 		}
 
 		public void dispatchCqEvent(IbvWC wc) throws IOException {

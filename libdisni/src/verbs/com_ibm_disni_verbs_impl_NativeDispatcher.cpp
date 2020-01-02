@@ -25,7 +25,6 @@
 
 /* Expose the PRI* macros in inttypes.h */
 #define __STDC_FORMAT_MACROS
-#define ENABLE_LOGGING
 
 #include "com_ibm_disni_verbs_impl_NativeDispatcher.h"
 #include <arpa/inet.h>
@@ -44,9 +43,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-//#ifdef HAVE_ODP_MR_PREFETCH
+#ifdef HAVE_ODP_MR_PREFETCH
 #include <infiniband/verbs_exp.h>
-//#endif
+#endif
 
 //#define MAX_WR 200;
 #define MAX_SGE 4;
@@ -807,17 +806,12 @@ Java_com_ibm_disni_verbs_impl_NativeDispatcher__1queryOdpSupport(JNIEnv *env,
                                                                  jobject obj,
                                                                  jlong id) {
   jint ret = -1;
-//#ifdef HAVE_ODP_MR_PREFETCH
+#ifdef HAVE_ODP_MR_PREFETCH
   struct ibv_context *context = (struct ibv_context *)id;
-  struct ibv_exp_device_attr dev_attr;
-  ret = ibv_exp_query_device(context, &dev_attr);
+  struct ibv_device_attr_ex dev_attr;
+  ret = ibv_query_device_ex(context, NULL, &dev_attr);
   if (ret == 0) {
-    if (dev_attr.odp_caps.general_odp_caps & IBV_EXP_ODP_SUPPORT_IMPLICIT) {
-       log("j2c::ibv_exp_query_device: implicit odp is supported\n");
-    }else{
-       log("j2c::ibv_exp_query_device: implicit odp is not supported\n");
-    }
-    if (dev_attr.odp_caps.general_odp_caps & IBV_EXP_ODP_SUPPORT) {
+    if (dev_attr.odp_caps.general_caps & IBV_ODP_SUPPORT) {
       ret = dev_attr.odp_caps.per_transport_caps.rc_odp_caps;
       log("j2c::queryOdpSupport: supported");
     } else {
@@ -825,7 +819,7 @@ Java_com_ibm_disni_verbs_impl_NativeDispatcher__1queryOdpSupport(JNIEnv *env,
       log("j2c::queryOdpSupport: not supported");
     }
   }
-//#endif
+#endif
   return ret;
 }
 
@@ -870,7 +864,7 @@ Java_com_ibm_disni_verbs_impl_NativeDispatcher__1expPrefetchMr(
 /*
  * Class:     com_ibm_disni_verbs_impl_NativeDispatcher
  * Method:    _regMr
- * Signature: (IIJIJJJ)J
+ * Signature: (IIJIJJJ)V
  */
 JNIEXPORT jlong JNICALL Java_com_ibm_disni_verbs_impl_NativeDispatcher__1regMr(
     JNIEnv *env, jobject obj, jlong pd, jlong address, jint len, jint access,
@@ -902,54 +896,6 @@ JNIEXPORT jlong JNICALL Java_com_ibm_disni_verbs_impl_NativeDispatcher__1regMr(
   } else {
     log("j2c::regMr: protection null\n");
     JNU_ThrowIOException(env, "j2c::regMr: protection null\n");
-  }
-
-  return obj_id;
-}
-
-
-/*
- * Class:     com_ibm_disni_verbs_impl_NativeDispatcher
- * Method:    _expRegMr
- * Signature: (JIJJJ)J
- */
-JNIEXPORT jlong JNICALL Java_com_ibm_disni_verbs_impl_NativeDispatcher__1expRegMr(
-    JNIEnv *env, jobject obj, jlong pd, jint access,
-    jlong lkey, jlong rkey, jlong handle) {
-  struct ibv_pd *protection = NULL;
-  // void *addr = (void *)address;
-  // jint ret = -1;
-  unsigned long long obj_id = -2;
-
- protection = (struct ibv_pd *)pd;
-  if (protection != NULL) {
-    struct ibv_exp_reg_mr_in in;
-    in.pd = protection;
-    in.addr = 0;
-    in.length = IBV_EXP_IMPLICIT_MR_SIZE;
-    //int accessA =
-    in.exp_access = IBV_EXP_ACCESS_LOCAL_WRITE|IBV_EXP_ACCESS_REMOTE_WRITE|IBV_EXP_ACCESS_REMOTE_READ|IBV_EXP_ACCESS_ON_DEMAND;
-    in.comp_mask = 0;
-    struct ibv_mr *mr = ibv_exp_reg_mr(&in);
-    if (mr != NULL) {
-      obj_id = createObjectId(mr);
-
-      int *_lkey = (int *)lkey;
-      int *_rkey = (int *)rkey;
-      int *_handle = (int *)handle;
-
-      *_lkey = mr->lkey;
-      *_rkey = mr->rkey;
-      *_handle = mr->handle;
-
-      log("j2c::expRegMr: obj_id %p, mr %p given_access: %d adjusted: %d\n", (void *)obj_id, (void *)mr,access);
-    } else {
-      log("j2c::expRegMr: ibv_exp_reg_mr failed\n");
-      JNU_ThrowIOExceptionWithLastError(env, "j2c::regMr: ibv_exp_reg_mr failed");
-    }
-  } else {
-    log("j2c::expRegMr: protection null\n");
-    JNU_ThrowIOException(env, "j2c::expRegMr: protection null\n");
   }
 
   return obj_id;
@@ -996,11 +942,10 @@ Java_com_ibm_disni_verbs_impl_NativeDispatcher__1postSend(JNIEnv *env,
   struct ibv_send_wr *bad_wr;
 
   queuepair = (struct ibv_qp *)qp;
-  //log("j2c::post_send: posting send\n");
   if (queuepair != NULL) {
     int ret = ibv_post_send(queuepair, wr, &bad_wr);
     if (ret == 0) {
-   //    log("j2c::post_send: went through", ret);
+      // log("j2c::post_send: ret %i\n", ret);
     } else {
       log("j2c::post_send: ibv_post_send failed %s\n", strerror(ret));
       JNU_ThrowIOExceptionWithReturnCode(
@@ -1031,7 +976,7 @@ Java_com_ibm_disni_verbs_impl_NativeDispatcher__1postRecv(JNIEnv *env,
     // log("j2c::post_recv: sizeof wr %zu, wrid %llu\n", sizeof *wr, wr->wr_id);
     int ret = ibv_post_recv(queuepair, wr, &bad_wr);
     if (ret == 0) {
-       //log("j2c::post_recv: went hrough ret %i\n", ret);
+      // log("j2c::post_recv: ret %i\n", ret);
     } else {
       log("j2c::post_recv: ibv_post_recv failed %s\n", strerror(ret));
       JNU_ThrowIOExceptionWithReturnCode(
@@ -1057,7 +1002,7 @@ Java_com_ibm_disni_verbs_impl_NativeDispatcher__1getCqEvent(JNIEnv *env,
   struct ibv_cq *dst_cq;
   void *dst_cq_ctx;
   jint ret = -1;
-  log("j2c::getCqEvent: get cq event\n");
+
   comp_channel = (struct ibv_comp_channel *)channel;
 
   if (comp_channel != NULL) {
@@ -1066,7 +1011,6 @@ Java_com_ibm_disni_verbs_impl_NativeDispatcher__1getCqEvent(JNIEnv *env,
     pollfdcomp.events = POLLIN;
     pollfdcomp.revents = 0;
     ret = poll(&pollfdcomp, 1, timeout);
-    log("j2c::getCqEvent: get cq event return %d\n",ret);
     if (ret > 0) {
       ret = ibv_get_cq_event(comp_channel, &dst_cq, &dst_cq_ctx);
     } else {
@@ -1091,11 +1035,11 @@ JNIEXPORT jint JNICALL Java_com_ibm_disni_verbs_impl_NativeDispatcher__1pollCQ(
   struct ibv_wc *wc = (struct ibv_wc *)wc_list;
   int num_entries = (int)ne;
   jint ret = -1;
-//  log("j2c::pollCQ: polling cq\n");
+
   completionqueue = (struct ibv_cq *)cq;
   if (completionqueue != NULL) {
     ret = ibv_poll_cq(completionqueue, num_entries, wc);
-    //log("j2c::pollCQ: return value %d\n",ret);
+    // log("j2c::pollCQ: ret %i\n", ret);
   } else {
     // log("j2c::pollCQ: completionqueue null\n");
     JNU_ThrowIOException(env, "j2c::pollCQ: completionqueue null");

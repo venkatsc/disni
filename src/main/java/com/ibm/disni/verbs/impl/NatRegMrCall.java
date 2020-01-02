@@ -52,12 +52,6 @@ public class NatRegMrCall extends SVCRegMr {
 	}
 
 	public NatRegMrCall(RdmaVerbsNat verbs, NativeDispatcher nativeDispatcher, MemoryAllocation memAlloc,
-						IbvPd pd,  int access) {
-		set(verbs, nativeDispatcher, memAlloc, pd,
-				 access);
-	}
-
-	public NatRegMrCall(RdmaVerbsNat verbs, NativeDispatcher nativeDispatcher, MemoryAllocation memAlloc,
 						IbvPd pd, long address, int length, int access) {
 		set(verbs, nativeDispatcher, memAlloc, pd, address, length, access);
 	}
@@ -75,29 +69,12 @@ public class NatRegMrCall extends SVCRegMr {
 		this.access = access;
 	}
 
-	private void set(RdmaVerbsNat verbs, NativeDispatcher nativeDispatcher, MemoryAllocation memAlloc,
-					 IbvPd pd,  int access) {
-		this.verbs = verbs;
-		this.nativeDispatcher = nativeDispatcher;
-		this.memAlloc = memAlloc;
-		this.cmd = memAlloc.allocate(3*4);
-		this.valid = true;
-		this.pd = (NatIbvPd) pd;
-		this.access = access;
-	}
-
 	public SVCRegMr execute() throws IOException {
 		cmd.getBuffer().clear();
 		if (!pd.isOpen()) {
 			throw new IOException("Trying to register memory with closed PD.");
 		}
-		long objId;
-		if (userAddress==0&& bufferCapacity==0){
-			objId = nativeDispatcher._expRegMr(pd.getObjId(), access, cmd.address(), cmd.address() + 4, cmd.address() + 8);
-		}else{
-			objId = nativeDispatcher._regMr(pd.getObjId(), userAddress, bufferCapacity, access, cmd.address(), cmd.address() + 4, cmd.address() + 8);
-		}
-
+		long objId = nativeDispatcher._regMr(pd.getObjId(), userAddress, bufferCapacity, access, cmd.address(), cmd.address() + 4, cmd.address() + 8);
 		if (objId <= 0){
 			throw new IOException("Memory registration failed with " + objId);
 		} else {

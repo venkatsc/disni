@@ -239,15 +239,6 @@ JNIEXPORT jlong JNICALL Java_com_ibm_disni_verbs_impl_NativeDispatcher__1regMr(
 
 /*
  * Class:     com_ibm_disni_verbs_impl_NativeDispatcher
- * Method:    _expRegMr
- * Signature: (JIJJJ)J
- */
-JNIEXPORT jlong JNICALL Java_com_ibm_disni_verbs_impl_NativeDispatcher__1expRegMr(
-    JNIEnv *, jobject , jlong , jint ,
-    jlong , jlong , jlong );
-
-/*
- * Class:     com_ibm_disni_verbs_impl_NativeDispatcher
  * Method:    _deregMr
  * Signature: (J)I
  */

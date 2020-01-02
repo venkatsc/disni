@@ -82,10 +82,6 @@ public class IbvPd  {
 	public SVCRegMr regMr(ByteBuffer buffer, int access) throws IOException {
 		return verbs.regMr(this, buffer, access);
 	}
-
-	public SVCRegMr regMr(int access) throws IOException {
-		return verbs.regMr(this,  access);
-	}
 	
 	public SVCRegMr regMr(long address, int length, int access) throws IOException {
 		return verbs.regMr(this, address, length, access);
