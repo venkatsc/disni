@@ -70,7 +70,7 @@ public class MemoryAllocation {
 
 	void free(MemBuf memBuf) {
 		memBuf.getBuffer().clear();
-		table.putIfAbsent(memBuf.size(), memBuf);
+		table.put(memBuf.size(), memBuf);
 	}
 
 	private MemBuf _allocate(int size) {
