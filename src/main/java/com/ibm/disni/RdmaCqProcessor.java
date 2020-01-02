@@ -77,6 +77,7 @@ public abstract class RdmaCqProcessor<C extends RdmaEndpoint> extends RdmaCqProv
 		
 		this.qpMap = new ConcurrentHashMap<Integer, C>();
 		this.thread = new Thread(this);
+		this.thread.setPriority(Thread.MAX_PRIORITY);
 	}
 	
 	public synchronized void registerQP(int qpnum, C endpoint) throws IOException {
